@@ -1,16 +1,19 @@
 #include <iostream>
+#include "core_numeric.h"
 
-// TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 int main() {
-    // TIP Press <shortcut actionId="RenameElement"/> when your caret is at the <b>lang</b> variable name to see how CLion can help you rename it.
-    auto lang = "C++";
-    std::cout << "Hello and welcome to " << lang << "!\n";
+    std::cout << "RESULTADOS:" << std::endl;
+    std::cout << "Suma: " << core_numeric::sum(v) << std::endl;
+    std::cout << "Promedio: " << core_numeric::mean(v) << std::endl;
+    std::cout << "Maximo: " << core_numeric::max(v) << std::endl;
+    std::cout << "Varianza: " << core_numeric::variance(v) << std::endl;
 
-    for (int i = 1; i <= 5; i++) {
-        // TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-        std::cout << "i = " << i << std::endl;
-    }
+    std::cout << "\nVARIADICAS" << std::endl;
+    std::cout << "Suma variádica: " << core_numeric::sum_variadic(1,2,3,4,5) << std::endl;
+    std::cout << "Max variádico: " << core_numeric::max_variadic(3,7,2,9,1,5) << std::endl;
 
+    std::cout << "\nTRANSFORMADA REDUCIDA" << std::endl;
+    auto cuadrados = core_numeric::transform_reduce(v, [](int x) { return x * x; });
+    std::cout << "Suma de cuadrados: " << cuadrados << std::endl;
     return 0;
-    // TIP See CLion help at <a href="https://www.jetbrains.com/help/clion/">jetbrains.com/help/clion/</a>. Also, you can try interactive lessons for CLion by selecting 'Help | Learn IDE Features' from the main menu.
 }
