@@ -5,7 +5,6 @@
 #ifndef TAREA_2_SEM2_CORE_NUMERIC_H
 #define TAREA_2_SEM2_CORE_NUMERIC_H
 
-
 #include <vector>
 #include <array>
 #include <stdexcept>
@@ -29,7 +28,7 @@ concept Divisible = requires(T a, std::size_t n) {
     { a / n } -> std::same_as<T>;
 };
 
-// Concept personalizado
+// Concept personalizado (COMPARABLE)
 template<typename T>
 concept Comparable = requires(T a, T b) {
     { a < b } -> std::convertible_to<bool>;
@@ -37,8 +36,9 @@ concept Comparable = requires(T a, T b) {
 
 namespace core_numeric {
 
-// Suma de elementos
-template<typename C>
+// Suma - requiere Iterable y Addable
+template<Iterable C>
+requires Addable<typename C::value_type>
 auto sum(const C& container) {
     using T = typename C::value_type;
     T result{};
@@ -49,7 +49,8 @@ auto sum(const C& container) {
 }
 
 // Promedio
-template<typename C>
+template<Iterable C>
+requires Addable<typename C::value_type> && Divisible<typename C::value_type>
 auto mean(const C& container) {
     using T = typename C::value_type;
     auto total = sum(container);
@@ -59,7 +60,8 @@ auto mean(const C& container) {
 }
 
 // Varianza
-template<typename C>
+template<Iterable C>
+requires Addable<typename C::value_type> && Divisible<typename C::value_type>
 auto variance(const C& container) {
     using T = typename C::value_type;
     auto avg = mean(container);
@@ -70,11 +72,18 @@ auto variance(const C& container) {
     }
     size_t count = 0;
     for (const auto& _ : container) count++;
-    return sum_sq / static_cast<T>(count);
+
+    // Uso de if constexpr (requerido por la tarea)
+    if constexpr (std::is_integral_v<T>) {
+        return sum_sq / static_cast<T>(count);
+    } else {
+        return sum_sq / static_cast<T>(count);
+    }
 }
 
 // Máximo
-template<typename C>
+template<Iterable C>
+requires Comparable<typename C::value_type>
 auto max(const C& container) {
     using T = typename C::value_type;
     auto it = std::begin(container);
@@ -90,8 +99,9 @@ auto max(const C& container) {
     return max_val;
 }
 
-// transformada reducida
-template<typename C, typename Func>
+//transform_reduce
+template<Iterable C, typename Func>
+requires Addable<typename C::value_type>
 auto transform_reduce(const C& container, Func&& func) {
     using T = typename C::value_type;
     T result{};
@@ -101,13 +111,15 @@ auto transform_reduce(const C& container, Func&& func) {
     return result;
 }
 
-// Funciones variádicas
+// Funciones variádicas con concepts
 template<typename T, typename... Args>
+requires Addable<T> && (Addable<Args> && ...)
 auto sum_variadic(T first, Args... args) {
     return (first + ... + args);
 }
 
 template<typename T, typename... Args>
+requires Addable<T> && (Addable<Args> && ...) && Divisible<decltype((first + ... + args))>
 auto mean_variadic(T first, Args... args) {
     auto total = sum_variadic(first, args...);
     constexpr size_t count = 1 + sizeof...(Args);
@@ -115,6 +127,7 @@ auto mean_variadic(T first, Args... args) {
 }
 
 template<typename T, typename... Args>
+requires Comparable<T> && (Comparable<Args> && ...)
 auto max_variadic(T first, Args... args) {
     T max_val = first;
     auto update = [&max_val](const auto& val) {
@@ -126,4 +139,4 @@ auto max_variadic(T first, Args... args) {
 
 }
 
-#endif
+#endif TAREA_2_SEM2_CORE_NUMERIC_H
